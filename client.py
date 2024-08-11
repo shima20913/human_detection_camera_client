@@ -8,7 +8,7 @@ load_dotenv()
 
 IMAGE_DIR = "./images"
 SERVER_URL = os.getenv("SERVER_URL")
-CAPTURE_DELAY = int(os.getenv("CAPTURE_DERAY", 1))
+CAPTURE_DELAY = int(os.getenv("CAPTURE_DELAY", 1)) #テスト用に環境変数から読み込めるようにしている
 
 os.mkdirs(IMAGE_DIR, exist_ok=True)
 capt = cv2.VideoCapture(0)
@@ -40,6 +40,8 @@ def sendToServer(filename):
                         time.sleep(CAPTURE_DELAY)
 
                         capt.release()
+
+
 
 
 
