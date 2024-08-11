@@ -1,4 +1,5 @@
 import os
+import time
 import cv2
 from dotenv import load_dotenv
 import requests
@@ -30,6 +31,11 @@ def sendToServer(filename):
                         if not ret:
                             print("failed get capture flame")
                             break
+
+                        filename = os.path.join(IMAGE_DIR, f"image-{int(time.time())}.jpg")
+                        cv2.imwrite(filename, frame)
+
+
 
          
             
