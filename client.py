@@ -11,7 +11,7 @@ CAPTURE_DELAY = int(os.getenv("CAPTURE_DERAY", 1))
 
 os.mkdirs(IMAGE_DIR, exist_ok=True)
 capt = cv2.VideoCapture(0)
-if not cap.isOpened():
+if not capt.isOpened():
     print("failed open camera")
     exit()
 
@@ -24,3 +24,14 @@ def sendToServer(filename):
             print("image sent to server successfully:", filename)
         except requests.exceptions.RequestExeption as e:
             print("Error sending image to server:", e)
+
+            while True:
+                        ret, frame = capt.read()
+                        if not ret:
+                            print("failed get capture flame")
+                            break
+
+         
+            
+            
+
