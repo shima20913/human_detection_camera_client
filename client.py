@@ -36,6 +36,11 @@ def sendToServer(filename):
                         cv2.imwrite(filename, frame)
 
                         sendToServer(filename)
+
+                        time.sleep(CAPTURE_DELAY)
+
+
+
                         
 
 
