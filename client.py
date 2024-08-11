@@ -39,6 +39,9 @@ def sendToServer(filename):
 
                         time.sleep(CAPTURE_DELAY)
 
+                        capt.release()
+
+
 
 
                         
