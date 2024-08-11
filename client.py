@@ -13,12 +13,12 @@ SERVER_URL = os.getenv("SERVER_URL")
 CAPTURE_DELAY = int(os.getenv("CAPTURE_DELAY", 1)) #テスト用に環境変数から読み込めるようにしている
 
 os.makedirs(IMAGE_DIR, exist_ok=True)
-camera = imageio.imread('<video0>')
+camera = imageio.imread(0)
 window = pyglet.window.Window(width=640, height=480)
 
 def sendToServer(filename):
     with open(filename, "rb") as file:
-        files = {'file': file}
+        files = {"file": file}
         try:
             response = requests.post(SERVER_URL, files=files)
             response.raise_for_status()
