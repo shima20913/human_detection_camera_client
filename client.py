@@ -1,6 +1,7 @@
 import os
 import time
-import cv2
+import pygame
+import pygame.camera
 from dotenv import load_dotenv
 import requests
 
@@ -11,10 +12,10 @@ SERVER_URL = os.getenv("SERVER_URL")
 CAPTURE_DELAY = int(os.getenv("CAPTURE_DELAY", 1)) #テスト用に環境変数から読み込めるようにしている
 
 os.makedirs(IMAGE_DIR, exist_ok=True)
-capt = cv2.VideoCapture(0)
-if not capt.isOpened():
-    print("failed open camera")
-    exit()
+pygame.init()
+pygame.camera.init()
+camera = pygame.camera.Camera(pygame.camera.list_cameras()[0], (640, 480))
+camera.start()
 
 def sendToServer(filename):
     with open(filename, "rb") as file:
@@ -23,23 +24,26 @@ def sendToServer(filename):
             response = requests.post(SERVER_URL, files=files)
             response.raise_for_status()
             print("image sent to server successfully:", filename)
-        except requests.exceptions.RequestExeption as e:
+        except requests.exceptions.RequestException as e:
             print("Error sending image to server:", e)
 
-            while True:
-                        ret, frame = capt.read()
-                        if not ret:
-                            print("failed get capture flame")
-                            break
+def captureAndSend():
+    while True:
+        image = camera.get_image()
+        filename = os.path.join(IMAGE_DIR, f"image-{int(time.time())}.jpg")
+        pygame.image.save(image, filename)
+        sendToServer(filename)
+        time.sleep(CAPTURE_DELAY)
 
-                        filename = os.path.join(IMAGE_DIR, f"image-{int(time.time())}.jpg")
-                        cv2.imwrite(filename, frame)
+if __name__ == "__main__":
+    try:
+        captureAndSend()
+    finally:
+        camera.stop()
+        pygame.quit()
 
-                        sendToServer(filename)
 
-                        time.sleep(CAPTURE_DELAY)
-
-                        capt.release()
+            
 
 
 
