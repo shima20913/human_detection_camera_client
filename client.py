@@ -35,6 +35,12 @@ def sendToServer(filename):
                         filename = os.path.join(IMAGE_DIR, f"image-{int(time.time())}.jpg")
                         cv2.imwrite(filename, frame)
 
+                        sendToServer(filename)
+                        
+
+
+
+
 
 
          
