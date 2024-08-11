@@ -1,6 +1,8 @@
 import os
 import time
-import cv2
+import imageio
+import pyglet
+from dotenv import load_dotenv
 from dotenv import load_dotenv
 import requests
 
@@ -11,10 +13,8 @@ SERVER_URL = os.getenv("SERVER_URL")
 CAPTURE_DELAY = int(os.getenv("CAPTURE_DELAY", 1)) #テスト用に環境変数から読み込めるようにしている
 
 os.makedirs(IMAGE_DIR, exist_ok=True)
-capt = cv2.VideoCapture(0)
-if not capt.isOpened():
-    print("failed open camera")
-    exit()
+camera = imageio.get_reader('<video0>')
+window = pyglet.window.Window(width=640, height=480)
 
 def sendToServer(filename):
     with open(filename, "rb") as file:
@@ -26,21 +26,15 @@ def sendToServer(filename):
         except requests.exceptions.RequestExeption as e:
             print("Error sending image to server:", e)
 
-            while True:
-                        ret, frame = capt.read()
-                        if not ret:
-                            print("failed get capture flame")
-                            break
-
+            def captureAndSend():
+                        frame = camera.get_next_data()
                         filename = os.path.join(IMAGE_DIR, f"image-{int(time.time())}.jpg")
-                        cv2.imwrite(filename, frame)
-
+                        imageio.imwrite(filename, frame)
                         sendToServer(filename)
+                        pyglet.clock.schedule_interval(captureAndSend, CAPTURE_DELAY)
+                        pyglet.app.run()
 
-                        time.sleep(CAPTURE_DELAY)
-
-                        capt.release()
-
+                        camera.close()
 
 
 
