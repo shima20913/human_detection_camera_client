@@ -1,7 +1,8 @@
+from io import BytesIO
 import os
 import time
-import imageio
-import pyglet
+import pygame
+import pygame.camera
 from dotenv import load_dotenv
 from dotenv import load_dotenv
 import requests
@@ -13,8 +14,10 @@ SERVER_URL = os.getenv("SERVER_URL")
 CAPTURE_DELAY = int(os.getenv("CAPTURE_DELAY", 1)) #テスト用に環境変数から読み込めるようにしている
 
 os.makedirs(IMAGE_DIR, exist_ok=True)
-camera = imageio.imread(0)
-window = pyglet.window.Window(width=640, height=480)
+pygame.init()
+pygame.camera.init()
+camera = pygame.camera.Camera(pygame.camera.list_cameras()[0], (640, 480))
+camera.start()
 
 def sendToServer(filename):
     with open(filename, "rb") as file:
@@ -27,14 +30,21 @@ def sendToServer(filename):
             print("Error sending image to server:", e)
 
             def captureAndSend():
-                        frame = camera.get_next_data()
+                while True:
+                        image = camera.get_image()
+                        image_data = BytesIO()
                         filename = os.path.join(IMAGE_DIR, f"image-{int(time.time())}.jpg")
-                        imageio.imwrite(filename, frame)
-                        sendToServer(filename)
-                        pyglet.clock.schedule_interval(captureAndSend, CAPTURE_DELAY)
-                        pyglet.app.run()
-
-                        camera.close()
+                        pygame.image.save(image, image_data)
+                        image_data.seek(0)
+                        sendToServer(image_data)
+                        time.sleep(CAPTURE_DELAY)
+                        
+        if __name__ == "__main__":
+                try:
+                 captureAndSend()
+                finally:
+                 camera.stop()
+                 pygame.quit()
 
 
 
