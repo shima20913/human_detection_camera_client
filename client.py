@@ -15,6 +15,12 @@ CAPTURE_DELAY = int(os.getenv("CAPTURE_DELAY", 1)) #テスト用に環境変数�
 os.makedirs(IMAGE_DIR, exist_ok=True)
 pygame.init()
 pygame.camera.init()
+
+if not pygame.camera.list_cameras():
+    print("No camera detected.")
+    pygame.quit()
+    exit()
+    
 camera = pygame.camera.Camera(pygame.camera.list_cameras()[0], (640, 480))
 camera.start()
 
