@@ -18,27 +18,25 @@ pygame.camera.init()
 camera = pygame.camera.Camera(pygame.camera.list_cameras()[0], (640, 480))
 camera.start()
 
-def sendToServer(filename):
-    with open(filename, "rb") as file:
-        files = {"file": file}
-        try:
-            response = requests.post(SERVER_URL, files=files)
-            response.raise_for_status()
-            print("image sent to server successfully:", filename)
-        except requests.exceptions.RequestException as e:
-            print("Error sending image to server:", e)
+def sendToServer(image_data):
+    try:
+        files = {'file': ('image.jpg', image_data, 'image/jpeg')}
+        response = requests.post(SERVER_URL, files=files)
+        response.raise_for_status()
+        print("image sent to server successfully:")
+    except requests.exceptions.RequestException as e:
+        print("Error sending image to server:", e)
 
-            def captureAndSend():
+    def captureAndSend():
                 while True:
                         image = camera.get_image()
                         image_data = BytesIO()
-                        filename = os.path.join(IMAGE_DIR, f"image-{int(time.time())}.jpg")
                         pygame.image.save(image, image_data)
                         image_data.seek(0)
                         sendToServer(image_data)
                         time.sleep(CAPTURE_DELAY)
                         
-        if __name__ == "__main__":
+    if __name__ == "__main__":
                 try:
                  captureAndSend()
                 finally:
