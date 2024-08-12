@@ -1,3 +1,4 @@
+from io import BytesIO
 import os
 import time
 import pygame
@@ -19,7 +20,7 @@ camera.start()
 
 def sendToServer(filename):
     with open(filename, "rb") as file:
-        files = {'file': file}
+        files = {"file": file}
         try:
             response = requests.post(SERVER_URL, files=files)
             response.raise_for_status()
@@ -27,23 +28,22 @@ def sendToServer(filename):
         except requests.exceptions.RequestException as e:
             print("Error sending image to server:", e)
 
-def captureAndSend():
-    while True:
-        image = camera.get_image()
-        filename = os.path.join(IMAGE_DIR, f"image-{int(time.time())}.jpg")
-        pygame.image.save(image, filename)
-        sendToServer(filename)
-        time.sleep(CAPTURE_DELAY)
-
-if __name__ == "__main__":
-    try:
-        captureAndSend()
-    finally:
-        camera.stop()
-        pygame.quit()
-
-
-            
+            def captureAndSend():
+                while True:
+                        image = camera.get_image()
+                        image_data = BytesIO()
+                        filename = os.path.join(IMAGE_DIR, f"image-{int(time.time())}.jpg")
+                        pygame.image.save(image, image_data)
+                        image_data.seek(0)
+                        sendToServer(image_data)
+                        time.sleep(CAPTURE_DELAY)
+                        
+        if __name__ == "__main__":
+                try:
+                 captureAndSend()
+                finally:
+                 camera.stop()
+                 pygame.quit()
 
 
 
